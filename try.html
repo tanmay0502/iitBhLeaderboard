@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Scraped Data</title>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th, td {
+        text-align: left;
+        padding: 8px;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      .collapsible-content {
+        display: none;
+      }
+
+      .collapsible-content.show {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Leaderboard 1</h1>
+    <table id="leaderboardTable1">
+      <tr>
+        <th>Name</th>
+        <th>Rank</th>
+      </tr>
+    </table>
+
+    <h1>Leaderboard 2</h1>
+    <button class="collapsible">Show Leaderboard</button>
+    <table id="leaderboardTable2" class="collapsible-content">
+      <tr>
+        <th>Name</th>
+        <th>Rank</th>
+      </tr>
+    </table>
+
+    <h1>Leaderboard 3</h1>
+    <button class="collapsible">Show Leaderboard</button>
+    <table id="leaderboardTable3" class="collapsible-content">
+      <tr>
+        <th>Name</th>
+        <th>Rank</th>
+      </tr>
+    </table>
+
+    <script>
+      var names = [
+        "harveySpector",
+        "the_detective",
+        "TheAlgorithm",
+        "akashdeeptemp1",
+        "Aman_1610",
+        "sahan_18",
+        "mohan_706",
+        "Dixiebloom",
+        "nbsbharath",
+        "dommatirohith",
+        "suresh0405bairwa",
+        "vetsatarun",
+        "kammelaaditya",
+        "Amitjakhar",
+        "karthik_leet111",
+        "satyamss2812",
+        "Sanat_Tudu",
+        "thakurvishesh1"
+      ]; // Array of names
+
+      function sortTable(table) {
+        var rows = table.rows;
+        var len = rows.length;
+        var swapped;
+        do {
+          swapped = false;
+          for (var i = 1; i < len - 1; i++) {
+            var a = parseInt(rows[i].getElementsByTagName('td')[1].innerHTML);
+            var b = parseInt(rows[i + 1].getElementsByTagName('td')[1].innerHTML);
+            if (a > b) {
+              rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+              swapped = true;
+            }
+          }
+        } while (swapped);
+      }
+
+      var promises = names.map(function(name) {
+        return fetch('https://leetcode.com/graphql?query={userContestRankingHistory(username:%22' + name + '%22){attended%20ranking%20contest{title%20startTime}}}')
+          .then(response => response.json())
+          .then(data => {
+            var userContestRankingHistory = data.data.userContestRankingHistory;
+            var rank1 = userContestRankingHistory.length > 0 ? userContestRankingHistory[userContestRankingHistory.length - 1].ranking : 0;
+            var rank2 = userContestRankingHistory.length > 1 ? userContestRankingHistory[userContestRankingHistory.length - 2].ranking : 0;
+            var rank3 = userContestRankingHistory.length > 2 ? userContestRankingHistory[userContestRankingHistory.length - 3].ranking : 0;
+            var c1 = userContestRankingHistory.length > 2 ? userContestRankingHistory[userContestRankingHistory.length - 3].contest.title : 0;
+            var c2 = userContestRankingHistory.length > 2 ? userContestRankingHistory[userContestRankingHistory.length - 3].contest.title : 0;
+            var c3 = userContestRankingHistory.length > 2 ? userContestRankingHistory[userContestRankingHistory.length - 3].contest.title : 0;
+            console.log("contests: 1" + c1," 2 ",c2, " 3 ",c3 )
+            return {
+              name: name,
+              rank1: rank1,
+              rank2: rank2,
+              rank3: rank3,
+              c1: c1,
+              c2: c2,
+              c3: c3,
+            };
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            return {
+              name: name,
+              rank1: 'N/A',
+              rank2: 'N/A',
+              rank3: 'N/A',
+              c1: 'N/A',
+              c2: 'N/A',
+              c3: 'N/A',
+            };
+          });
+      });
+
+      Promise.all(promises)
+        .then(function(results) {
+          results.sort(function(a, b) {
+            return a.rank1 - b.rank1;
+          });
+
+          var leaderboardTable1 = document.getElementById('leaderboardTable1');
+          var leaderboardTable2 = document.getElementById('leaderboardTable2');
+          var leaderboardTable3 = document.getElementById('leaderboardTable3');
+          var leaderboard2Button = document.getElementsByClassName('collapsible')[0];
+          var leaderboard3Button = document.getElementsByClassName('collapsible')[1];
+
+          results.forEach(function(result) {
+            if (result.rank1 !== 0) {
+              var row1 = leaderboardTable1.insertRow(-1);
+              var nameCell1 = row1.insertCell(0);
+              var rankCell1 = row1.insertCell(1);
+
+              nameCell1.innerHTML = result.name;
+              rankCell1.innerHTML = result.rank1;
+            }
+
+            if (result.rank2 !== 0) {
+              var row2 = leaderboardTable2.insertRow(-1);
+              var nameCell2 = row2.insertCell(0);
+              var rankCell2 = row2.insertCell(1);
+
+              nameCell2.innerHTML = result.name;
+              rankCell2.innerHTML = result.rank2;
+            }
+
+            if (result.rank3 !== 0) {
+              var row3 = leaderboardTable3.insertRow(-1);
+              var nameCell3 = row3.insertCell(0);
+              var rankCell3 = row3.insertCell(1);
+
+              nameCell3.innerHTML = result.name;
+              rankCell3.innerHTML = result.rank3;
+            }
+          });
+
+          sortTable(leaderboardTable1);
+          sortTable(leaderboardTable2);
+          sortTable(leaderboardTable3);
+
+          leaderboard2Button.addEventListener('click', function() {
+            leaderboardTable2.classList.toggle('show');
+          });
+
+          leaderboard3Button.addEventListener('click', function() {
+            leaderboardTable3.classList.toggle('show');
+          });
+        });
+    </script>
+  </body>
+</html>
