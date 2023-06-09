@@ -27,7 +27,7 @@
     </style>
   </head>
   <body>
-    <h1>Leaderboard 1</h1>
+    <h1 id="l1">Leaderboard 1</h1>
     <table id="leaderboardTable1">
       <tr>
         <th>Name</th>
@@ -35,7 +35,7 @@
       </tr>
     </table>
 
-    <h1>Leaderboard 2</h1>
+    <h1 id="l2">Leaderboard 2</h1>
     <button class="collapsible">Show Leaderboard</button>
     <table id="leaderboardTable2" class="collapsible-content">
       <tr>
@@ -44,7 +44,7 @@
       </tr>
     </table>
 
-    <h1>Leaderboard 3</h1>
+    <h1 id="l3">Leaderboard 3</h1>
     <button class="collapsible">Show Leaderboard</button>
     <table id="leaderboardTable3" class="collapsible-content">
       <tr>
@@ -100,10 +100,13 @@
             var rank1 = userContestRankingHistory.length > 0 ? userContestRankingHistory[userContestRankingHistory.length - 1].ranking : 0;
             var rank2 = userContestRankingHistory.length > 1 ? userContestRankingHistory[userContestRankingHistory.length - 2].ranking : 0;
             var rank3 = userContestRankingHistory.length > 2 ? userContestRankingHistory[userContestRankingHistory.length - 3].ranking : 0;
-            var c1 = userContestRankingHistory.length > 2 ? userContestRankingHistory[userContestRankingHistory.length - 3].contest.title : 0;
-            var c2 = userContestRankingHistory.length > 2 ? userContestRankingHistory[userContestRankingHistory.length - 3].contest.title : 0;
+            var c1 = userContestRankingHistory.length > 2 ? userContestRankingHistory[userContestRankingHistory.length - 1].contest.title : 0;
+            var c2 = userContestRankingHistory.length > 2 ? userContestRankingHistory[userContestRankingHistory.length - 2].contest.title : 0;
             var c3 = userContestRankingHistory.length > 2 ? userContestRankingHistory[userContestRankingHistory.length - 3].contest.title : 0;
             console.log("contests: 1" + c1," 2 ",c2, " 3 ",c3 )
+            document.getElementById('l1').innerHTML = c1
+            document.getElementById('l2').innerHTML = c2
+            document.getElementById('l3').innerHTML = c3
             return {
               name: name,
               rank1: rank1,
@@ -175,6 +178,7 @@
 
           leaderboard2Button.addEventListener('click', function() {
             leaderboardTable2.classList.toggle('show');
+            
           });
 
           leaderboard3Button.addEventListener('click', function() {
